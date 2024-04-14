@@ -256,3 +256,128 @@ public class Main {
                             }
                         } while (opcion != 12);
                         break;
+
+                    case 3:
+                        usuarios = leer();
+
+                        break;
+                    case 4:
+
+                        guardar(usuarios);
+                        break;
+                    case 5:
+                        informeGeneral(usuarios);
+
+                        break;
+                    case 6:
+                        System.out.println("Hasta pronto");
+                        break;
+
+                    default:
+                        System.out.println("Número introducido incorrecto");
+                }
+
+            } catch (InputMismatchException e) {
+                System.out.println("Entrada incorrecta. Introduce un valor válido.");
+                sc.next(); // Limpiar el buffer del scanner
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            } catch (Exception e) {
+                System.out.println("Ocurrió un error inesperado: " + e.getMessage());
+            }
+
+        } while (opcionI != 6);
+
+
+
+    }
+    public static void guardar(RegistroUsuarios usuarios){
+        try {
+            FileOutputStream datos = new FileOutputStream("fitnessapp.dat");
+            ObjectOutputStream archivo = new ObjectOutputStream(datos);
+            archivo.writeObject(usuarios);
+            archivo.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("No se ha encontrado el archivo");
+        } catch (IOException e) {
+            System.out.println("Ha habido un error abriendo el archivo");
+        }
+    }
+
+    public static RegistroUsuarios leer(){
+        RegistroUsuarios usuarios;
+        try {
+            FileInputStream datos = new FileInputStream("fitnessapp.dat");
+            ObjectInputStream archivo = new ObjectInputStream(datos);
+            usuarios = (RegistroUsuarios) archivo.readObject();
+            return usuarios;
+        } catch (IOException e) {
+            System.out.println("Ha habido un error abriendo el archivo");
+        } catch (ClassNotFoundException e) {
+            System.out.println("No se ha encontrado el archivo");
+        }
+        return new RegistroUsuarios();
+    }
+
+    public static void informeEspecífico(Usuario usuarioactual){
+        try {
+            PrintWriter pw = new PrintWriter("informe_" +usuarioactual.getNombre()+"_"+LocalDate.now().getYear()+"_"+LocalDate.now().getMonth()+"_"+LocalDate.now().getDayOfMonth()+"_.txt");
+            pw.println("-------------------------------------------------------------------------");
+            pw.println("|                           INFORME DE EJERCICIOS                       |");
+            pw.println("-------------------------------------------------------------------------");
+            pw.println("USUARIO: " + usuarioactual.getNombre());
+            pw.println("Edad: " + usuarioactual.getEdad());
+            pw.println("Nivel: "+ usuarioactual.getNivel());
+            pw.println("Ejercicios realizados: ");
+            pw.println("     Fecha       Ejercicio    Intensidad   Características                ");
+
+            for (Ejercicio e : usuarioactual.getEjerciciosRealizados()){
+                if (e.getClass() == Fuerza.class){
+                    if(((Fuerza) e).getRepeticiones() == 1)
+                        pw.printf("     %s  %-15s  %d        %.1fKg  %-2d repetición.\n",e.getFecha(),e.getNombre(),e.getIntesidad(),((Fuerza) e).getPeso(),((Fuerza) e).getRepeticiones());
+                    else
+                        pw.printf("     %s  %-15s  %d        %.1fKg  %-2d repeticiones.\n",e.getFecha(),e.getNombre(),e.getIntesidad(),((Fuerza) e).getPeso(),((Fuerza) e).getRepeticiones());
+                }
+                else if (e.getClass() == Cardio.class) {
+                    pw.printf("     %s  %-15s  %d        %.1fKm  %-2.0f min.\n",e.getFecha(),e.getNombre(),e.getIntesidad(),((Cardio) e).getDistancia(),((Cardio) e).getDuracion());
+
+                }
+                else if (e.getClass() == Flexibilidad.class) {
+                    if(((Flexibilidad) e).getRepeticiones() == 1)
+                        pw.printf("     %s  %-15s  %d        %-2d repetición.\n",e.getFecha(),e.getNombre(),e.getIntesidad(),((Flexibilidad) e).getRepeticiones());
+                    else
+                        pw.printf("     %s  %-15s  %d        %-2d repeticiones.\n",e.getFecha(),e.getNombre(),e.getIntesidad(),((Flexibilidad) e).getRepeticiones());
+                }
+
+            }
+            pw.println("Total calorías consumidas: " + usuarioactual.calcularCaloríasEjercicio(usuarioactual.getEjerciciosRealizados()));
+            pw.println("Media de intensidad de los ejercicios: " + usuarioactual.calcularPromedioIntensidad());
+            pw.close();
+            System.out.println("Archivo creado correctamente");
+        } catch (FileNotFoundException e) {
+            System.out.println("No se ha encontrado el archivo. ");
+        } catch (IOException e) {
+            System.out.println("Error abriendo el archivo");
+        }
+    }
+    public static void informeGeneral(RegistroUsuarios usuarios){
+        try {
+            PrintWriter pw = new PrintWriter("Informe_general_"+LocalDate.now().getYear()+"_"+LocalDate.now().getMonthValue()+"_"+LocalDate.now().getDayOfMonth()+".txt");
+            pw.println("------------------------------------------------------------------");
+            pw.println("| NOMBRE          | EJERCICIOS | NIVEL        | MEDIA INTENSIDAD |");
+            for(Usuario u : usuarios.getUsuarios()){
+                pw.println("------------------------------------------------------------------");
+                if(u.getNombre().length() > 18)
+                    pw.printf("|%-14s...| %11d| %-13s| %17d|\n",u.getNombre().substring(0,14),u.getEjerciciosRealizados().size(),u.getNivel(),u.calcularPromedioIntensidad());
+                else
+                    pw.printf("|%-17s| %11d| %-13s| %17d|\n",u.getNombre(),u.getEjerciciosRealizados().size(),u.getNivel(),u.calcularPromedioIntensidad());
+            }
+            pw.println("------------------------------------------------------------------");
+            pw.close();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+}
+
