@@ -1,0 +1,12 @@
+-------------------------------------------------------------------------
+|                           INFORME DE EJERCICIOS                       |
+-------------------------------------------------------------------------
+USUARIO: Pablo
+Edad: 18
+Nivel: INTERMEDIO
+Ejercicios realizados: 
+     Fecha       Ejercicio    Intensidad   Características                
+     2024-01-11  Banca            7        100,0Kg  3  repeticiones.
+     2024-11-09  correr           8        20,0Km  120 min.
+Total calorías consumidas: 28532
+Media de intensidad de los ejercicios: 7
